@@ -3,7 +3,7 @@
 namespace Omnibus\Ups\Tests;
 
 use Omnibus\Model\TrackingStatus;
-use Omnibus\Tests\Fixtures;
+use Omnibus\Testing\Fixtures;
 use Omnibus\Ups\UpsGatewayFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
