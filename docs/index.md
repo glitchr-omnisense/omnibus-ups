@@ -56,6 +56,9 @@ Shipment options read when booking (`Shipment::$options`):
 The factory also declares a `shipper` option (default `null`), which no code reads: the sender is
 always the shipment's `sender`.
 
+> [!WARNING]
+> Known defect: `shipper` is declared and never read, where the factory's docblock calls it the default sender.
+
 ## Capabilities
 
 | Request | Supported |
