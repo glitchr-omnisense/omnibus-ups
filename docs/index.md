@@ -1,6 +1,6 @@
 # omnibus/ups
 
-UPS for [omniscient/omnibus](https://github.com/glitchr-studio/omnibus): rates, shipments and
+UPS for [omnisense/omnibus](https://github.com/glitchr-omnisense/omnibus): rates, shipments and
 labels, tracking and UPS Access Points, through UPS's REST APIs on an OAuth 2 client-credentials
 token. The gateway calls:
 
@@ -22,7 +22,7 @@ Environment, `sandbox: true`). The API version is the constant `Omnibus\Ups\Api:
 composer require omnibus/ups
 ```
 
-Requires PHP 8.2, `omniscient/omnibus` (2.x) and `symfony/http-client` (6.4, 7 or 8). In a Symfony
+Requires PHP 8.2, `omnisense/omnibus` (2.x) and `symfony/http-client` (6.4, 7 or 8). In a Symfony
 application with `Omnibus\Bridge\Symfony\OmnibusBundle`, the factory is registered as soon as the
 package is installed.
 
@@ -44,7 +44,7 @@ account.
 | `client_secret` | string | - | yes | the app's client secret |
 | `account_number` | string | - | yes | the shipper account |
 | `sandbox` | bool | `false` | no | `true`: the Customer Integration Environment |
-| `rates` | list | - | no | prices from configuration instead of the Rating API ([the rates option](https://github.com/glitchr-studio/omnibus/blob/2.x/docs/configuration.md#the-rates-option)) |
+| `rates` | list | - | no | prices from configuration instead of the Rating API ([the rates option](https://github.com/glitchr-omnisense/omnibus/blob/2.x/docs/configuration.md#the-rates-option)) |
 
 Shipment options read when booking (`Shipment::$options`):
 

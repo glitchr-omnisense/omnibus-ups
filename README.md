@@ -1,6 +1,6 @@
 # omnibus/ups
 
-UPS for [omniscient/omnibus](https://github.com/glitchr-studio/omnibus): rates (Rating API, Shop),
+UPS for [omnisense/omnibus](https://github.com/glitchr-omnisense/omnibus): rates (Rating API, Shop),
 shipments and labels (Shipping API), tracking (Tracking API) and UPS Access Points (Locator API)
 - the REST APIs with OAuth2 client credentials.
 
@@ -8,7 +8,7 @@ shipments and labels (Shipping API), tracking (Tracking API) and UPS Access Poin
 $gateway = (new UpsGatewayFactory($http))->create($options);   // $http: the application's HTTP client - none given, the factory makes its own; the options below
 ```
 
-No framework needed: the package requires `omniscient/omnibus` and `symfony/http-client`. In a
+No framework needed: the package requires `omnisense/omnibus` and `symfony/http-client`. In a
 Symfony application, the same through the bundle's configuration:
 
 ```yaml
