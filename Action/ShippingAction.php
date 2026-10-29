@@ -23,6 +23,9 @@ final class ShippingAction implements ActionInterface, ApiAwareInterface
         $this->apiClass = Api::class;
     }
 
+    /** ShippingLabel ImageFormat codes (Shipping API: EPL, SPL, ZPL, GIF, PNG) and their media types. */
+    private const FORMATS = ['GIF' => 'image/gif', 'PNG' => 'image/png', 'ZPL' => Label::ZPL, 'EPL' => 'application/epl', 'SPL' => 'application/spl', 'PDF' => Label::PDF];
+
     public function supports(Request $request): bool
     {
         return $request instanceof Shipping;
@@ -59,7 +62,7 @@ final class ShippingAction implements ActionInterface, ApiAwareInterface
 
         $request->setResult(new Label('ups', $number,
             \is_string($image) ? base64_decode($image) : null,
-            'ZPL' === $code ? Label::ZPL : ('GIF' === $code ? 'image/gif' : Label::PDF),
+            self::FORMATS[$code] ?? 'application/octet-stream',
             trackingUrl: 'https://www.ups.com/track?tracknum='.rawurlencode($number),
         ));
     }

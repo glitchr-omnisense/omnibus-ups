@@ -50,14 +50,10 @@ Shipment options read when booking (`Shipment::$options`):
 
 | Option | Default | |
 |---|---|---|
-| `label_format` | `PDF` | `PDF`, `GIF` or `ZPL`. UPS has no PDF label: `PDF` asks for `GIF`, and the label comes back as `image/gif` |
+| `label_format` | `PDF` | `PDF`, `GIF`, `ZPL`, `EPL` or `SPL`. UPS has no PDF label: `PDF` asks for `GIF`, and the label comes back as `image/gif`; each code UPS answers is labelled with its own media type (`image/gif`, `image/png`, `application/zpl`, `application/epl`, `application/spl`; an unknown one `application/octet-stream`) |
 | `description` | `Parcel` | the shipment's description |
 
-The factory also declares a `shipper` option (default `null`), which no code reads: the sender is
-always the shipment's `sender`.
-
-> [!WARNING]
-> Known defect: `shipper` is declared and never read, where the factory's docblock calls it the default sender.
+The shipper is always the shipment's `sender`, with the account number: no option replaces it.
 
 ## Capabilities
 

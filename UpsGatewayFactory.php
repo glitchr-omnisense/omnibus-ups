@@ -16,7 +16,6 @@ use Symfony\Component\HttpClient\HttpClient;
  *     client_secret: '%env(UPS_CLIENT_SECRET)%'
  *     account_number: '%env(UPS_ACCOUNT)%'       # the shipper account (6 characters)
  *     sandbox: true                               # the Customer Integration Environment
- *     shipper: { name, street: [], postcode, city, country, phone }  # the default sender
  *     rates: [...]                                # optional: prices from configuration instead of the Rating API
  */
 final class UpsGatewayFactory extends GatewayFactory
@@ -28,7 +27,6 @@ final class UpsGatewayFactory extends GatewayFactory
             'omnibus.factory_title' => 'UPS',
             'omnibus.required_options' => ['client_id', 'client_secret', 'account_number'],
             'sandbox' => false,
-            'shipper' => null,
             'omnibus.api' => function (Config $c) {
                 $http = $this->http ?? HttpClient::create();
 

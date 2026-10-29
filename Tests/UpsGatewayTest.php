@@ -2,6 +2,7 @@
 
 namespace Omnibus\Ups\Tests;
 
+use Omnibus\Model\Label;
 use Omnibus\Model\TrackingStatus;
 use Omnibus\Testing\Fixtures;
 use Omnibus\Ups\UpsGatewayFactory;
@@ -12,6 +13,8 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 final class UpsGatewayTest extends TestCase
 {
     private array $calls = [];
+
+    private string $imageFormat = 'GIF';
 
     private function gateway(): \Omnibus\GatewayInterface
     {
@@ -26,7 +29,7 @@ final class UpsGatewayTest extends TestCase
                     ['Service' => ['Code' => '07'], 'TotalCharges' => ['CurrencyCode' => 'EUR', 'MonetaryValue' => '42.10'], 'GuaranteedDelivery' => ['BusinessDaysInTransit' => '1']],
                     ['Service' => ['Code' => '11'], 'TotalCharges' => ['CurrencyCode' => 'EUR', 'MonetaryValue' => '12.90']],
                 ]]])),
-                str_ends_with($path, '/ship') => new MockResponse(json_encode(['ShipmentResponse' => ['ShipmentResults' => ['ShipmentIdentificationNumber' => '1Z999AA10123456784', 'PackageResults' => [['TrackingNumber' => '1Z999AA10123456784', 'ShippingLabel' => ['ImageFormat' => ['Code' => 'GIF'], 'GraphicImage' => base64_encode('GIF89a')]]]]]])),
+                str_ends_with($path, '/ship') => new MockResponse(json_encode(['ShipmentResponse' => ['ShipmentResults' => ['ShipmentIdentificationNumber' => '1Z999AA10123456784', 'PackageResults' => [['TrackingNumber' => '1Z999AA10123456784', 'ShippingLabel' => ['ImageFormat' => ['Code' => $this->imageFormat], 'GraphicImage' => base64_encode('GIF89a')]]]]]])),
                 str_contains($path, '/track/v1/details/') => new MockResponse(json_encode(['trackResponse' => ['shipment' => [['package' => [['activity' => [
                     ['date' => '20261002', 'time' => '101500', 'status' => ['type' => 'D', 'description' => 'Delivered', 'code' => 'KB'], 'location' => ['address' => ['city' => 'STRASBOURG', 'countryCode' => 'FR']]],
                     ['date' => '20261001', 'time' => '080000', 'status' => ['type' => 'I', 'description' => 'Departed from facility', 'code' => 'DP']],
@@ -97,5 +100,17 @@ final class UpsGatewayTest extends TestCase
     {
         $this->expectException(\Omnibus\Exception\InvalidConfigException::class);
         (new UpsGatewayFactory())->create(['client_id' => 'x']);
+    }
+
+    /**
+     * The Shipping API's ShippingLabel ImageFormat (Shipping.yaml: EPL, SPL, ZPL, GIF, PNG): each
+     * code labelled with its own media type, not application/pdf.
+     */
+    public function testEachLabelImageFormatIsLabelledAsItIs(): void
+    {
+        foreach (['GIF' => 'image/gif', 'ZPL' => Label::ZPL, 'EPL' => 'application/epl', 'SPL' => 'application/spl', 'PNG' => 'image/png', 'XYZ' => 'application/octet-stream'] as $code => $type) {
+            $this->imageFormat = $code;
+            self::assertSame($type, $this->gateway()->ship(Fixtures::shipment())->format, $code);
+        }
     }
 }
