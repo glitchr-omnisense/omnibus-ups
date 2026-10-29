@@ -3,6 +3,7 @@
 namespace Omnibus\Ups;
 
 use Omnibus\Exception\CarrierException;
+use Omnibus\Http\Redaction;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface as HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -44,14 +45,16 @@ final class Api
             $status = $response->getStatusCode();
             $data = json_decode($response->getContent(false), true);
         } catch (HttpExceptionInterface|\JsonException $e) {
-            throw new CarrierException('ups', 'UPS request failed: '.$e->getMessage(), null, $e);
+            $secrets = $this->secrets();
+
+            throw Redaction::withoutArguments(new CarrierException('ups', 'UPS request failed: '.Redaction::text($e->getMessage(), $secrets), null, Redaction::copy($e, $secrets)));
         }
         if (!\is_array($data)) {
-            throw new CarrierException('ups', sprintf('UPS answered HTTP %d with a body that is not JSON.', $status));
+            throw Redaction::withoutArguments(new CarrierException('ups', sprintf('UPS answered HTTP %d with a body that is not JSON.', $status)));
         }
         if ($status >= 400) {
             $error = $data['response']['errors'][0] ?? [];
-            throw new CarrierException('ups', (string) ($error['message'] ?? sprintf('HTTP %d', $status)), isset($error['code']) ? (string) $error['code'] : null);
+            throw Redaction::withoutArguments(new CarrierException('ups', (string) ($error['message'] ?? sprintf('HTTP %d', $status)), isset($error['code']) ? (string) $error['code'] : null));
         }
 
         return $data;
@@ -70,14 +73,26 @@ final class Api
                 'timeout' => $this->timeout,
             ])->toArray(false);
         } catch (HttpExceptionInterface $e) {
-            throw new CarrierException('ups', 'UPS gave no token: '.$e->getMessage(), null, $e);
+            $secrets = $this->secrets();
+
+            throw Redaction::withoutArguments(new CarrierException('ups', 'UPS gave no token: '.Redaction::text($e->getMessage(), $secrets), null, Redaction::copy($e, $secrets)));
         }
         if (empty($data['access_token'])) {
-            throw new CarrierException('ups', (string) ($data['response']['errors'][0]['message'] ?? 'UPS gave no token: check the client id and secret.'));
+            throw Redaction::withoutArguments(new CarrierException('ups', (string) ($data['response']['errors'][0]['message'] ?? 'UPS gave no token: check the client id and secret.')));
         }
         $this->token = (string) $data['access_token'];
         $this->expiresAt = time() + (int) ($data['expires_in'] ?? 14400);
 
         return $this->token;
+    }
+
+    /**
+     * What a failure must not carry: the credentials and the token, and what a request made of them.
+     *
+     * @return list<string>
+     */
+    private function secrets(string ...$more): array
+    {
+        return [$this->clientSecret, (string) $this->token, ...$more];
     }
 }

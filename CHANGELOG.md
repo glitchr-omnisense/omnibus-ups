@@ -3,6 +3,12 @@
 ## [Unreleased]
 
 ### Fixed
+- A `CarrierException` no longer carries the client secret and the token. The message quoted the
+  HTTP client's (the whole URL), the previous was the client's own exception, and every trace of the
+  chain kept the arguments of the calls under it (the request's options, the `Api` with its
+  credentials) when `zend.exception_ignore_args` is off: a log of the whole chain wrote them. The
+  message masks them as `***`, the previous is a copy of the client's exception (the same class and
+  code), and no exception `Api` throws keeps its trace's arguments (`Omnibus\Http\Redaction`).
 - Access Points' opening hours are ISO weekdays in `HH:MM`: UPS's Locator numbers the days 1
   Sunday to 7 Saturday and writes military `HHMM` (`930`, `0` at midnight), and both were passed on
   as written (Sunday became Monday, `0900` stayed `0900`). The regular hours (`HoursType` 10) are
