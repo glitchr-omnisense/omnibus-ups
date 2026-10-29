@@ -31,7 +31,10 @@ final class UpsGatewayTest extends TestCase
                     ['date' => '20261002', 'time' => '101500', 'status' => ['type' => 'D', 'description' => 'Delivered', 'code' => 'KB'], 'location' => ['address' => ['city' => 'STRASBOURG', 'countryCode' => 'FR']]],
                     ['date' => '20261001', 'time' => '080000', 'status' => ['type' => 'I', 'description' => 'Departed from facility', 'code' => 'DP']],
                 ]]]]]]])),
-                str_contains($path, '/locations/') => new MockResponse(json_encode(['LocatorResponse' => ['SearchResults' => ['DropLocation' => [['LocationID' => 'L1', 'AccessPointInformation' => ['PublicAccessPointID' => 'U12345'], 'AddressKeyFormat' => ['ConsigneeName' => 'TABAC DE LA GARE', 'AddressLine' => '2 PLACE DE LA GARE', 'PoliticalDivision2' => 'STRASBOURG', 'PostcodePrimaryLow' => '67000', 'CountryCode' => 'FR'], 'Geocode' => ['Latitude' => '48.585', 'Longitude' => '7.735'], 'Distance' => ['Value' => '0.4']]]]]])),
+                str_contains($path, '/locations/') => new MockResponse(json_encode(['LocatorResponse' => ['SearchResults' => ['DropLocation' => [['LocationID' => 'L1', 'AccessPointInformation' => ['PublicAccessPointID' => 'U12345'], 'AddressKeyFormat' => ['ConsigneeName' => 'TABAC DE LA GARE', 'AddressLine' => '2 PLACE DE LA GARE', 'PoliticalDivision2' => 'STRASBOURG', 'PostcodePrimaryLow' => '67000', 'CountryCode' => 'FR'], 'Geocode' => ['Latitude' => '48.585', 'Longitude' => '7.735'], 'Distance' => ['Value' => '0.4'], 'OperatingHours' => ['StandardHours' => [
+                    ['HoursType' => '50', 'DayOfWeek' => [['Day' => '2', 'LatestDropOffHours' => '1700']]],
+                    ['HoursType' => '10', 'DayOfWeek' => [['Day' => '1', 'ClosedIndicator' => ''], ['Day' => '2', 'OpenHours' => '930', 'CloseHours' => '1900'], ['Day' => '3', 'OpenHours' => '0', 'CloseHours' => '0', 'Open24HoursIndicator' => ''], ['Day' => '7', 'OpenHours' => '0800', 'CloseHours' => '1230']]],
+                ]]]]]]])),
                 default => new MockResponse(json_encode(['response' => ['errors' => [['code' => '404', 'message' => 'No such resource '.$path]]]]), ['http_code' => 404]),
             };
         });
@@ -76,6 +79,18 @@ final class UpsGatewayTest extends TestCase
         self::assertSame('TABAC DE LA GARE', $points[0]->name);
         self::assertSame(400, $points[0]->distance);
         self::assertSame('67000', $points[0]->address->postcode);
+    }
+
+    /**
+     * The Locator (UPS-API/api-documentation, Locator.yaml): StandardHours is a list by HoursType
+     * (10 the regular hours), Day is 1 for Sunday to 7 for Saturday, hours are military HHMM
+     * ("930", "0" for midnight), ClosedIndicator marks a closed day and Open24HoursIndicator a
+     * day open around the clock. Read as ISO weekdays and "HH:MM".
+     */
+    public function testAccessPointHoursAreIsoWeekdaysInHoursAndMinutes(): void
+    {
+        $points = $this->gateway()->pickupPoints(Fixtures::shipment()->recipient, 5);
+        self::assertSame([1 => [['09:30', '19:00']], 2 => [['00:00', '24:00']], 6 => [['08:00', '12:30']]], $points[0]->openingHours);
     }
 
     public function testTheCredentialsAreRequired(): void

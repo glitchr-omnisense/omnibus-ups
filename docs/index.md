@@ -132,8 +132,11 @@ A shipment of several packages has the events of each package in turn.
 **Pickup points.** Active UPS Access Points (`AccessPointStatus 01`) within 25 km of the address
 (its first street line, city, postcode and country), at most `min(50, limit)`; the parcel is not
 sent. The id is the Access Point's public id (else the location id), the distance UPS's kilometres
-converted to metres, opening hours read from UPS's standard hours by its `Day` number and its
-`OpenHours` / `CloseHours` as UPS writes them.
+converted to metres. Opening hours are UPS's regular hours (the `StandardHours` of `HoursType`
+`10`, else the first set): UPS numbers the days 1 Sunday to 7 Saturday, read as ISO weekdays
+(1 Monday to 7 Sunday), and writes military `HHMM` times (`930`, `0` at midnight), read as
+`HH:MM` (a closing at midnight `24:00`); a day with `ClosedIndicator` is left out, one with
+`Open24HoursIndicator` is `00:00`-`24:00`.
 
 ## Example
 
@@ -215,9 +218,9 @@ family's conformance suite on recorded answers (every failure a `CarrierExceptio
 requests refused before any call). The recorded answers follow UPS's published API documentation.
 
 Not verified: no call was made to UPS, on the Customer Integration Environment or live; that
-needs the credentials above. Two readings of the Locator's answer are unchecked against a real
-one: whether its `Day` numbers are ISO weekdays (1 = Monday), and whether its hours are written
-`HH:MM` (they are passed on as UPS writes them).
+needs the credentials above. The opening hours follow the Locator's published schema
+(UPS-API/api-documentation, `Locator.yaml`: `Day` 1 Sunday, military `HHMM`), unchecked against
+a real answer.
 
 ## Responsibility
 
