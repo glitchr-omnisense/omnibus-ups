@@ -1,0 +1,149 @@
+{
+    "$schema": "https://github.com/glitchr-omnisense/contracts/blob/1.x/resources/usage-policy.schema.json",
+    "provider": "ups",
+    "rateLimits": [
+        {
+            "max": 40000,
+            "window": "month",
+            "scope": "application",
+            "operations": [
+                "track"
+            ],
+            "note": "Community tier (free). The pricing page's table says 90,000 Tracking calls a month, its FAQ example 40,000: the lower figure is declared. The month is UPS's 31-day cycle from the application's creation."
+        },
+        {
+            "max": 1000,
+            "window": "month",
+            "scope": "application",
+            "operations": [
+                "pickupPoints"
+            ],
+            "note": "Community tier: Locator API."
+        },
+        {
+            "max": 10000,
+            "window": "month",
+            "scope": "application",
+            "operations": [
+                "cancel"
+            ],
+            "note": "Community tier: Void API."
+        }
+    ],
+    "concurrency": null,
+    "plans": {
+        "default": "community",
+        "plans": {
+            "community": {
+                "rateLimits": [
+                    {
+                        "max": 40000,
+                        "window": "month",
+                        "scope": "application",
+                        "operations": [
+                            "track"
+                        ],
+                        "note": "Community tier (free). The pricing page's table says 90,000 Tracking calls a month, its FAQ example 40,000: the lower figure is declared. The month is UPS's 31-day cycle from the application's creation."
+                    },
+                    {
+                        "max": 1000,
+                        "window": "month",
+                        "scope": "application",
+                        "operations": [
+                            "pickupPoints"
+                        ],
+                        "note": "Community tier: Locator API."
+                    },
+                    {
+                        "max": 10000,
+                        "window": "month",
+                        "scope": "application",
+                        "operations": [
+                            "cancel"
+                        ],
+                        "note": "Community tier: Void API."
+                    }
+                ],
+                "source": "https://developer.ups.com/pricing?loc=en_US",
+                "verifiedAt": "2026-11-10",
+                "note": "Free. Rating, Shipping, Pickup and Paperless Documents unlimited."
+            },
+            "power-user": {
+                "rateLimits": [
+                    {
+                        "max": 12000000,
+                        "window": "month",
+                        "scope": "application",
+                        "operations": [
+                            "track"
+                        ],
+                        "note": "Power User tier"
+                    },
+                    {
+                        "max": 1000000,
+                        "window": "month",
+                        "scope": "application",
+                        "operations": [
+                            "pickupPoints"
+                        ],
+                        "note": "Power User tier: Locator"
+                    },
+                    {
+                        "max": 10000000,
+                        "window": "month",
+                        "scope": "application",
+                        "operations": [
+                            "cancel"
+                        ],
+                        "note": "Power User tier: Void"
+                    }
+                ],
+                "source": "https://developer.ups.com/pricing?loc=en_US",
+                "verifiedAt": "2026-11-10",
+                "note": "USD 3,500 a month."
+            },
+            "enterprise": {
+                "rateLimits": null,
+                "source": "https://developer.ups.com/pricing?loc=en_US",
+                "verifiedAt": "2026-11-10",
+                "note": "Free for shippers, limits agreed per account: unknown here."
+            }
+        }
+    },
+    "rights": {
+        "commercial": "contract",
+        "openSourceRequired": false,
+        "caching": {
+            "permission": "contract",
+            "maxTtl": null
+        },
+        "storage": "contract",
+        "redistribution": "forbidden",
+        "attribution": {
+            "required": false,
+            "text": null,
+            "url": null,
+            "where": []
+        },
+        "licence": null,
+        "retention": {
+            "maxAge": 23328000,
+            "covers": "Shipping Information: at most 9 months after the request (UPS API Access Agreement, section 4(e)); all of a shipper's data destroyed within 5 business days of a deletion request, a lost access or a year without shipping"
+        }
+    },
+    "requirements": {
+        "key": true,
+        "userAgent": {
+            "required": false,
+            "pattern": null
+        }
+    },
+    "provenance": {
+        "terms": "https://filexfer.ups.com/assets/resources/webcontent/en_US/ups_api_access_agreement.pdf",
+        "policy": "https://developer.ups.com/pricing?loc=en_US",
+        "verifiedAt": "2026-11-10",
+        "declaredBy": "maintainer",
+        "contact": "https://developer.ups.com/pricing",
+        "notes": "UPS API Access Agreement (version 052024). Each API also has a per-minute spike arrest (429 until the next minute) whose figure is not published. Tracking only for packages the user ships with UPS (\"abusing or data mining the API\" revokes access; tracking business rules). Shipping Information goes only to the shipper or a person with a bona fide interest in the shipment: no aggregation across shippers, no database, no carrier comparison, no private label (sections 3(c), 4(b), 4(d)). Locator results discarded at the end of each session. Data shown in its entirety, every service level returned shown, no delivery date of one's own. Each merchant uses its own credentials and accepts the UPS terms. No idempotency key on Ship, Void or Paperless: a shipment is sent once."
+    }
+}

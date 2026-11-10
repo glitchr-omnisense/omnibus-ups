@@ -192,6 +192,10 @@ omnibus:
 The core's Docker harness calls the same gateway from its console with the keys in
 `docker/.env`: `docker compose run --rm omnibus rate ups --to-country GB --weight 1200`.
 
+## Usage policy
+
+`policy.json` (named in `composer.json`'s `extra.omnisense.policy`) declares UPS's Community plan (the default): 40,000 tracking, 1,000 Locator and 10,000 Void calls a month (the pricing page says 90,000 and 40,000 for tracking: the lower is declared); the Power User and Enterprise plans are named in `plans` (the `plan` option picks one). Shipping information is kept 9 months at most and shared only with those who have an interest in the shipment (`rights.retention`, UPS API Access Agreement). No idempotency key on shipments: a shipment is sent once. A 429 is a `RateLimitedException`, never retried, and the carrier's next calls wait for its `Retry-After`, unsent. See omnisense/omnibus' [Usage policies and rate limits](https://github.com/glitchr-omnisense/omnibus/blob/2.x/docs/policies.md).
+
 ## Errors
 
 Every failure is an `Omnibus\Exception\CarrierException` whose `carrier` is `ups`:

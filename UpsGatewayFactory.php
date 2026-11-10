@@ -25,12 +25,13 @@ final class UpsGatewayFactory extends GatewayFactory
         $config->defaults([
             'omnibus.factory_name' => 'ups',
             'omnibus.factory_title' => 'UPS',
+            'omnibus.policy' => __DIR__.'/policy.json',
             'omnibus.required_options' => ['client_id', 'client_secret', 'account_number'],
             'sandbox' => false,
             'omnibus.api' => function (Config $c) {
                 $http = $this->http ?? HttpClient::create();
 
-                return new Api($http, (string) $c['client_id'], (string) $c['client_secret'], (string) $c['account_number'], (bool) $c['sandbox']);
+                return new Api($http, (string) $c['client_id'], (string) $c['client_secret'], (string) $c['account_number'], (bool) $c['sandbox'], backoff: $c->backoff());
             },
             'omnibus.action.rating' => static fn (Config $c) => $c->get('rates') ? null : new RatingAction(),
             'omnibus.action.shipping' => new ShippingAction(),
