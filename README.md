@@ -4,6 +4,42 @@ UPS for [omnisense/omnibus](https://github.com/glitchr-omnisense/omnibus): rates
 shipments and labels (Shipping API), tracking (Tracking API) and UPS Access Points (Locator API)
 - the REST APIs with OAuth2 client credentials.
 
+## Install and a first call
+
+```sh
+composer require omnibus/ups
+```
+
+No account for this first call: UPS's answer is recorded (`Omnibus\Testing\RecordedHttpClient`
+answers in place of the API), so nothing leaves the process. With your own credentials, give the
+factory your HTTP client (or none: it makes its own) and drop the recorded one.
+
+```php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+use Omnibus\Testing\RecordedHttpClient;
+use Omnibus\Ups\UpsGatewayFactory;
+
+// UPS's answer, recorded: no account, and nothing leaves the process.
+$http = new RecordedHttpClient([
+    'POST /security/v1/oauth/token' => ['access_token' => 'tok', 'expires_in' => 14399],
+    '/track/v1/details/' => ['trackResponse' => ['shipment' => [['package' => [['activity' => [
+        ['date' => '20261002', 'time' => '101500', 'status' => ['type' => 'D', 'description' => 'Delivered', 'code' => 'KB'], 'location' => ['address' => ['city' => 'STRASBOURG', 'countryCode' => 'FR']]],
+    ]]]]]]],
+]);
+$gateway = (new UpsGatewayFactory($http))->create(['client_id' => 'id', 'client_secret' => 'secret', 'account_number' => 'A1B2C3', 'sandbox' => true]);
+
+$tracking = $gateway->track('1Z999AA10123456784');
+echo $tracking->status->value, ' - ', $tracking->latest()?->description, "\n";   // delivered - Delivered
+```
+
+A real call needs a UPS account (the credentials below). The answer is shaped after UPS's published
+documentation; the package has not been run against its service yet.
+
+## Configuration
+
 ```php
 $gateway = (new UpsGatewayFactory($http))->create($options);   // $http: the application's HTTP client - none given, the factory makes its own; the options below
 ```
